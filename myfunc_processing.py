@@ -8,9 +8,10 @@ def sobel_filter(image):
     edge_image = np.zeros((height, width))
 
     # Sobel 커널 (official setting. x축 방향과 y축 방향으로 편미분을 수행하는 커널)
-    Kx = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
-    Ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-
+    #Kx = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+    #Ky = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
+    Kx = np.array([[-3, 0, 3], [-3, 0, 3], [-3, 0, 3]])
+    Ky = np.array([[-3, -10, -3], [0, 0, 0], [3, 10, 3]])
     # 이미지를 순회하며 Sobel 필터 적용
     for y in range(1, height-1):
         for x in range(1, width-1):
@@ -23,8 +24,9 @@ def sobel_filter(image):
     edge_image = np.uint8(np.clip(edge_image / np.max(edge_image) * 255, 0, 255)) # 0~255 사이의 값으로 변환
     return edge_image
 
+
 def unsharp_masking(image, sigma=3, strength=2): # sigma: 가우시안 블러의 표준편차, strength: 선명화 강도.
-    height, width = image.shape
+    height, width, _ = image.shape
     # 가우시안 블러 처리한 이미지
     blurred_image = gaussian_blur(image, sigma)
     # Unsharp Masking 적용 (원본 이미지에서 가우시안 블러 처리한 이미지를 빼고 strength를 곱함. image=strength*(image-blurred_image)
@@ -36,7 +38,7 @@ def gaussian_blur(image, sigma):
     size = int(sigma * 3) * 2 + 1
     # 가우시안 커널 생성
     gaussian_kernel = create_gaussian_kernel(size, sigma)
-    height, width = image.shape
+    height, width, _ = image.shape
     blurred_image = np.zeros((height, width))
     # 가우시안 블러 적용 (가우시안 커널과 이미지의 원소를 곱한 후 모두 더함(element-wise))
     for y in range(size//2, height-size//2): # 이미지의 가장자리는 가우시안 블러 적용이 불가능하므로 제외
@@ -63,11 +65,17 @@ def prewitt_filter(img):
 def log_filter(img):
     pass
 
-image = cv2.imread('Lenna.png', cv2.IMREAD_GRAYSCALE)
-sobel_filtered = sobel_filter(image)
-unsharp_filtered = unsharp_masking(image)
+# image = cv2.imread('Lenna.png', cv2.IMREAD_GRAYSCALE)
+image = cv2.imread('Lenna.png')
+# sobel_filtered = sobel_filter(image)
+sobel_filtered = sobel_filter_rgb(image)
+# unsharp_filtered = unsharp_masking(image)
 
+cv2.imshow('Original', image)
+# cv2.imshow('Sobel Filtered', sobel_filtered)
 cv2.imshow('Sobel Filtered', sobel_filtered)
-cv2.imshow('Unsharp Masking', unsharp_filtered)
+
+
+# cv2.imshow('Unsharp Masking', unsharp_filtered)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
